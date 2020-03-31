@@ -10,12 +10,16 @@
 
 ## 查询
 
+
 ### 按服务和操作简要查询
+
 
 ![按服务和操作查询](https://github.com/11061055/jaeger_client_example/blob/master/img/total.png)
 
+
 ![按服务和操作查询](https://github.com/11061055/jaeger_client_example/blob/master/img/task1_total.png)
 
-### 按服务和操作详细查询
+
+### 按 trace id 查询
 
 ![按服务和操作查询](https://github.com/11061055/jaeger_client_example/blob/master/img/task1_detail.png)
