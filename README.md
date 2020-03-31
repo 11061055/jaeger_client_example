@@ -6,7 +6,7 @@
 
 ## 使用
 
-以 java client 为例, 下载即可运行. 其中 JAEGER_AGENT_HOST 是 UDP 包接收地址.
+以 java client 为例, 下载即可运行. 其中 JAEGER_AGENT_HOST 是 UDP 包接收地址. 数据包尽量小于 MTU 避免分包.
 
 ## 查询
 
