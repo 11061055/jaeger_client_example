@@ -53,3 +53,5 @@ int main(int argc, char* argv[])
 
     return 0;
 }
+
+// g++ main.cpp --std=c++11 -lopentracing -ljaegertracing -lyaml-cpp -lthrift
