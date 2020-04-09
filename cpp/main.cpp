@@ -35,6 +35,7 @@ int main(int argc, char* argv[])
 
     auto parentSpan = opentracing::Tracer::Global()->StartSpan("doTask1");
 
+    // loop
     for (int i = 0; i < 1000; ++i)
     {
         std::cout << i << std::endl;
