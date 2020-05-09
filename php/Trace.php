@@ -4,16 +4,6 @@
  * User: ssssssssss
  * Date: 2020/05/10
  * Time: 上午11:30
- *
- * Description: Every function is a kind of of operation.
- *
- *              And we can use debug_backtrace() to get the function stacks.
- *
- *              So it is easy for us to identify the "child of" or "follow of" relations.
- *
- * Usage: i) Run "composer require jukylin/jaeger-php" to add dependent libraries.
-
- *       ii) Surround your code with "\jaeger\Trace::trigger()" and "\jaeger\Trace::close()"
  */
 
 namespace jaeger;
@@ -49,7 +39,7 @@ class Operation {
 
     public function startAsRoot(&$tracer) {
 
-        // 这里可以 获取 环境变量 中 注入 的 外部 trace id 和 span id, 默认 使用 1000000 1000001
+        // 这里可以 获取 环境 变量中 注入 的 外部 trace id 和 span id, 默认 使用 1000000 1000001
         $context = new \Jaeger\SpanContext(1000000, 1000001, 1);
 
         $this->start($tracer, [\OpenTracing\Reference::CHILD_OF => $context]);
@@ -126,11 +116,10 @@ class Trace
     private static $_opMapAll = [];
     private static $_opMapInUse = [];
 
-    public static function init($service)
+    public static function init($service, $host)
     {
 
         $config = \Jaeger\Config::getInstance();
-        $host = \Conf::get("jaeger.host");
 
         if (empty($host) || self::$_tracer != null) {
             return;
@@ -159,7 +148,7 @@ class Trace
         $stacks = array_reverse($stacks);
         $flags  = self::getOperationFlags($stacks);
         $flags  = array_reverse($flags);
-        if (count($flags) <= 1) {
+        if (count($flags) <= 0) {
             return;
         }
 
@@ -202,7 +191,7 @@ class Trace
         $stacks = array_reverse($stacks);
         $flags  = self::getOperationFlags($stacks);
         $flags  = array_reverse($flags);
-        if (count($flags) <= 1) {
+        if (count($flags) <= 0) {
             return;
         }
 
@@ -218,6 +207,7 @@ class Trace
             $operation->stop();
             unset(self::$_opMapInUse[$presentFlag]);
         }
+        self::$_config->flush();
     }
 
     private static function getOperationFlags($stacks) {
