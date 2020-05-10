@@ -22,7 +22,8 @@
 
 开始 一个 Span : Trace::trigger();
 结束 一个 Span : Trace::close();
-
+```
+```
 示例如下:
 
 <?php
