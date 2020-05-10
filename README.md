@@ -35,7 +35,9 @@ class Curler {
     public function exe() {
     
         Trace::trigger();
-        usleep(1000000);
+        
+        usleep(1000000); // 模拟业务逻辑
+        
         Trace::close();
     }
 }
@@ -48,6 +50,7 @@ class Tester {
     
         $this->curler = new Curler();
         
+        // 初始化 和 注册 清理 函数 用于处理未正确 close 的
         Trace::init("tester", "xxx.xxx.xxx.xxx:6831"); // jaeger-agent ip
         
         register_shutdown_function(function () {
