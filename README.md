@@ -18,7 +18,7 @@
 ## 使用
 
 ```
-以 PHP 为例, 下载即可运行. 数据包需要小于 MTU 避免分包.
+以 PHP 为例, 下载即可运行.
 
 开始 一个 Span : Trace::trigger();
 结束 一个 Span : Trace::close();
