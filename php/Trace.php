@@ -39,7 +39,7 @@ class Operation {
 
     public function startAsRoot(&$tracer) {
 
-        // 这里可以 获取 环境 变量中 注入 的 外部 trace id 和 span id, 默认 使用 1000000 1000001
+        // 这里可以 获取 HTTP-X-XYOS-TRACE 设置 对应的 trace id 和 span id, 默认 使用 1000000 1000001
         $context = new \Jaeger\SpanContext(1000000, 1000001, 1);
 
         $this->start($tracer, [\OpenTracing\Reference::CHILD_OF => $context]);
@@ -55,7 +55,7 @@ class Operation {
 
             $operation->stop();
 
-            //var_dump("unset ".spl_object_id($operation)." from " .spl_object_id($this));
+            //var_dump("del ".spl_object_id($operation)." as child of " .spl_object_id($this));
 
             unset($this->children[$flag]);
         }
@@ -79,7 +79,7 @@ class Operation {
 
         $childOperation->start($tracer, [\OpenTracing\Reference::CHILD_OF => $context]);
 
-        //var_dump("add child ".spl_object_id($childOperation)." to " .spl_object_id($this));
+        //var_dump("add ".spl_object_id($childOperation)." as child of " .spl_object_id($this));
 
         $childOperation->parent = &$this;
 
@@ -94,7 +94,7 @@ class Operation {
 
         $this->start($tracer, ["references" => (\OpenTracing\Reference::create(\OpenTracing\Reference::FOLLOWS_FROM, $context))]);
 
-        //var_dump("brother ". spl_object_id($this). " ".spl_object_id($brotherOperation));
+        //var_dump("brother of ". spl_object_id($this). " is ".spl_object_id($brotherOperation));
 
         if($this->parent == null) {
             return;
@@ -144,15 +144,22 @@ class Trace
     public static function trigger() {
 
         $stacks = debug_backtrace();
-        array_shift($stacks);
-        $stacks = array_reverse($stacks);
-        $flags  = self::getOperationFlags($stacks);
-        $flags  = array_reverse($flags);
-        if (count($flags) <= 0) {
+
+        if (count($stacks) < 2) {
             return;
         }
 
+        array_shift($stacks);
+
+        $presentStack = $stacks[0];
+
+        $stacks = array_reverse($stacks);
+        $flags  = self::getOperationFlags($stacks);
+        $flags  = array_reverse($flags);
+
         $presentFlag = $flags[0];
+
+        self::genOperation($presentFlag, $presentStack);
 
         $presentOperation = &self::$_opMapAll[$presentFlag];
 
@@ -174,6 +181,7 @@ class Trace
 
                 }
 
+                // var_dump("$presentFlag is now in use.");
                 self::$_opMapInUse[$presentFlag] = true;
 
                 return;
@@ -181,23 +189,25 @@ class Trace
         }
 
         $presentOperation->startAsRoot(self::$_tracer);
+        // var_dump("$presentFlag is now in use.");
         self::$_opMapInUse[$presentFlag] = true;
     }
 
     public static function close() {
 
         $stacks = debug_backtrace();
-        array_shift($stacks);
-        $stacks = array_reverse($stacks);
-        $flags  = self::getOperationFlags($stacks);
-        $flags  = array_reverse($flags);
-        if (count($flags) <= 0) {
+
+        if (count($stacks) < 2) {
             return;
         }
 
-        $presentFlag = $flags[0];
+        array_shift($stacks);
 
-        array_shift($flags);
+        $stacks = array_reverse($stacks);
+        $flags  = self::getOperationFlags($stacks);
+        $flags  = array_reverse($flags);
+
+        $presentFlag = $flags[0];
 
         $exist = isset(self::$_opMapInUse[$presentFlag]) ? self::$_opMapInUse[$presentFlag] : false;
 
@@ -205,6 +215,7 @@ class Trace
 
             $operation = &self::$_opMapAll[$presentFlag];
             $operation->stop();
+            // var_dump("$presentFlag is now not in use.");
             unset(self::$_opMapInUse[$presentFlag]);
         }
         self::$_config->flush();
@@ -219,20 +230,28 @@ class Trace
 
             $name   = $stack['class']."::".$stack['function'];
             $prefix = $prefix."|".$name;
-            $name   = explode("\\", $name);
-            $name   = $name[count($name) - 1];
             $flag   = self::genFlagFromStackPrefix($prefix);
 
             $flags[]= $flag;
-
-            if (!isset(self::$_opMapAll[$flag])) {
-
-                self::$_opMapAll[$flag] = new Operation($flag, $name);
-
-                //var_dump("new ".$name." : ".spl_object_id(self::$_opMapAll[$flag]));
-            }
         }
+
         return $flags;
+    }
+
+
+    private static function genOperation($flag, $stack) {
+
+        if (isset(self::$_opMapAll[$flag])) {
+            return;
+        }
+
+        $name   = $stack['class']."::".$stack['function'];
+        $name   = explode("\\", $name);
+        $name   = $name[count($name) - 1];
+
+        self::$_opMapAll[$flag] = new Operation($flag, $name);
+
+        // var_dump("new name: $name flag: $flag ".spl_object_id(self::$_opMapAll[$flag]));
     }
 
     private static function genFlagFromStackPrefix($prefix) {
