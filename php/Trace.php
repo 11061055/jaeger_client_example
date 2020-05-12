@@ -218,7 +218,6 @@ class Trace
             // var_dump("$presentFlag is now not in use.");
             unset(self::$_opMapInUse[$presentFlag]);
         }
-        self::$_config->flush();
     }
 
     private static function getOperationFlags($stacks) {
