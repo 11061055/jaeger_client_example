@@ -1,4 +1,4 @@
-# jaeger deploy and client example ( Java PHP C++ )
+# jaeger client example ( Java PHP C++ ) ( 非业务侵入 )
 
 ## 背景与说明
 
