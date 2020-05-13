@@ -92,7 +92,7 @@ class Operation {
 
         $context   = $this->span->getContext();
 
-        $this->start($tracer, ["references" => (\OpenTracing\Reference::create(\OpenTracing\Reference::FOLLOWS_FROM, $context))]);
+        $brotherOperation->start($tracer, ["references" => (\OpenTracing\Reference::create(\OpenTracing\Reference::FOLLOWS_FROM, $context))]);
 
         //var_dump("brother of ". spl_object_id($this). " is ".spl_object_id($brotherOperation));
 
