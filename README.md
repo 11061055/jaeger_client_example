@@ -49,11 +49,11 @@ class Curler {
     
     
     
-        Trace::trigger();
+        Trace::trigger();  // 开始记录一个函数，开始 Span
         
-                                            usleep(1000000); // 模拟业务逻辑
+                                                              usleep(1000000); // 模拟业务逻辑
         
-        Trace::close();
+        Trace::close();    // 结束记录一个函数，结束 Span
         
         
         
@@ -91,15 +91,17 @@ class Tester {
     
     
   
-        Trace::trigger();
+        Trace::trigger();  // 开始记录一个函数，开始 Span
         
-                                     usleep(1000000);
+        
+                                                               usleep(1000000);
 
-                                     for($i = 0; $i < 2; $i++) {
-                                         $this->exe_i($i);
-                                     }
+                                                               for($i = 0; $i < 2; $i++) {
+                                                                   $this->exe_i($i);            // exe_i 当中的 Trigger/Close 对应的 Span 是 exe 中的子 Span
+                                                               }
+                                                  
         
-        Trace::close();
+        Trace::close();    // 结束记录一个函数，结束 Span
         
         
 
@@ -109,13 +111,13 @@ class Tester {
     
     
 
-        Trace::trigger();
+        Trace::trigger();   // 开始记录一个函数，开始 Span
         
-                                      usleep(1000000);
+                                                                   usleep(1000000);
 
-                                      $this->curler->exe();
+                                                                   $this->curler->exe();
 
-        Trace::close();
+        Trace::close();     // 结束记录一个函数，结束 Span
 
 
 
