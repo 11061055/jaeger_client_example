@@ -8,6 +8,10 @@ namespace jaeger;
 use Jaeger\Config;
 use Jaeger\Constants;
 
+// Each function is abstracted as an operation, with flag as a unique identity.      每个函数都被抽象成一个 Operation, 由 flag 唯一标志
+// And span records all detail messages such as start time and end time.             span 单中记录所有相信信息, 比如 开始时间 结束时间
+// All Operations form into a DAG, so parent and children record the relationship.   所有 Operation 组成一个 DAG 图, parent 和 children 记录这种关系
+
 class Operation {
 
     public $flag;      // int64
