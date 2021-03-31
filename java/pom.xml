@@ -9,7 +9,7 @@
 	<description>Jaeger Tracing Client Test</description>
 	<properties>
 		<jaeger.version>1.2.0</jaeger.version>
-		<guava.version>26.0-jre</guava.version>
+		<guava.version>29.0-jre</guava.version>
 		<logback.version>1.2.1</logback.version>
 	</properties>
 	<dependencies>
